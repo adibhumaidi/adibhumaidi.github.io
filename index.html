@@ -9,29 +9,43 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
+  /* =========================================================
+     CONTROL PANEL — tukar nombor kat sini je.
+     Semua benda lain ikut sendiri. Tak payah sentuh CSS bawah.
+     ========================================================= */
   :root{
-    --ink:#16202B;
-    --ink-soft:#4A5A66;
-    --paper:#F1F3F2;
-    --panel:#FFFFFF;
-    --rule:#C7D0CE;
-    --cleared:#14675A;
-    --held:#A9741A;
-    --stopped:#8A2E22;
-    --measure:66ch;
+    /* --- SAIZ & JARAK --- */
+    --page-width:1080px;    /* lebar keseluruhan site. Nak lagi lebar? 1200px */
+    --gutter:28px;          /* jarak kiri-kanan dari tepi skrin */
+    --section-space:64px;   /* jarak atas-bawah setiap section. Nak rapat? 44px */
+    --base-size:17px;       /* saiz teks biasa. Nak besar? 18px */
+    --measure:66ch;         /* panjang satu baris teks. Jangan lebih 75ch */
+    --panel-pad:22px;       /* padding dalam petak (diagram, rail) */
+    --radius:2px;           /* bucu petak. 0 = tajam, 8px = bulat */
+
+    /* --- WARNA --- */
+    --ink:#16202B;          /* teks utama */
+    --ink-soft:#4A5A66;     /* teks kelabu */
+    --paper:#F1F3F2;        /* background page */
+    --panel:#FFFFFF;        /* background petak putih */
+    --rule:#C7D0CE;         /* garisan pemisah */
+    --cleared:#14675A;      /* hijau — invoice lepas */
+    --held:#A9741A;         /* kuning — invoice tertahan */
+    --stopped:#8A2E22;      /* merah — invoice reject */
   }
+  /* ===================== habis control panel ===================== */
   *{box-sizing:border-box}
-  html{-webkit-text-size-adjust:100%}
+  html{-webkit-text-size-adjust:100%;scroll-behavior:smooth}
   body{
     margin:0;
     background:var(--paper);
     color:var(--ink);
     font-family:'Archivo',"Helvetica Neue",Arial,system-ui,sans-serif;
-    font-size:17px;
+    font-size:var(--base-size);
     line-height:1.6;
     font-weight:400;
   }
-  .wrap{max-width:1080px;margin:0 auto;padding:0 28px}
+  .wrap{max-width:var(--page-width);margin:0 auto;padding:0 var(--gutter)}
   a{color:var(--cleared);text-decoration:none;border-bottom:1px solid rgba(20,103,90,.35)}
   a:hover{border-bottom-color:var(--cleared)}
   a:focus-visible,button:focus-visible{outline:2px solid var(--cleared);outline-offset:3px}
@@ -41,6 +55,33 @@
   p{margin:0 0 14px;max-width:var(--measure)}
   .lede{font-size:18px;color:var(--ink-soft)}
 
+  /* ---------- sticky nav ---------- */
+  .nav{position:fixed;top:0;left:0;right:0;z-index:60;background:rgba(255,255,255,.94);
+    -webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);border-bottom:1px solid var(--rule);
+    transform:translateY(-101%);transition:transform .3s cubic-bezier(.22,.61,.36,1)}
+  .nav.show{transform:none}
+  .nav-in{max-width:var(--page-width);margin:0 auto;padding:0 var(--gutter);height:58px;display:flex;align-items:center;justify-content:space-between;gap:24px}
+  .nav-name{font-weight:700;font-size:16.5px;letter-spacing:-.02em}
+  .nav-links{display:flex;gap:22px;align-items:center}
+  .nav-links a{font-size:15px;font-weight:500;color:var(--ink-soft);border-bottom:1px solid transparent;transition:color .18s ease,border-color .18s ease}
+  .nav-links a:hover{color:var(--ink);border-bottom-color:var(--rule)}
+  .nav-links a.active{color:var(--cleared);border-bottom-color:var(--cleared)}
+  .nav-cta{padding:8px 15px;font-size:14.5px;font-weight:600;background:var(--ink);color:#fff;border:0;border-radius:2px}
+  .nav-cta:hover{background:#0D1720;border:0}
+  section{scroll-margin-top:74px}
+
+  /* ---------- hero diagram draw-in ---------- */
+  .dg-box,.dg-label,.dg-out{opacity:0}
+  .dg-line{stroke-dasharray:120;stroke-dashoffset:120}
+  .dg-match{opacity:0;transform-box:fill-box;transform-origin:center}
+  .drawn .dg-box,.drawn .dg-label{animation:dgFade .45s ease forwards}
+  .drawn .dg-line{animation:dgDraw .6s ease forwards .35s}
+  .drawn .dg-match{animation:dgPop .4s cubic-bezier(.34,1.4,.64,1) forwards .9s}
+  .drawn .dg-out{animation:dgFade .5s ease forwards 1.25s}
+  @keyframes dgFade{to{opacity:1}}
+  @keyframes dgDraw{to{stroke-dashoffset:0}}
+  @keyframes dgPop{from{opacity:0;transform:scale(.88)}to{opacity:1;transform:scale(1)}}
+
   /* ---------- hero ---------- */
   header{border-bottom:1px solid var(--rule);background:var(--panel)}
   .hero{display:grid;grid-template-columns:1.25fr .85fr;gap:56px;padding:64px 0 56px;align-items:start}
@@ -48,15 +89,15 @@
   .role{font-size:clamp(19px,2.3vw,23px);font-weight:500;margin-top:14px;color:var(--ink);max-width:34ch;line-height:1.32}
   .hero p.lede{margin-top:18px}
   .status{display:inline-flex;align-items:center;gap:10px;margin-top:6px;padding:7px 14px 7px 12px;
-    border:1px solid var(--cleared);color:var(--cleared);border-radius:2px;font-size:14.5px;font-weight:600}
+    border:1px solid var(--cleared);color:var(--cleared);border-radius:var(--radius);font-size:14.5px;font-weight:600}
   .dot{width:8px;height:8px;background:var(--cleared);border-radius:50%;flex:none}
   .actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:28px}
-  .btn{display:inline-block;padding:13px 22px;font-size:15.5px;font-weight:600;border-radius:2px;border:1px solid var(--ink)}
+  .btn{display:inline-block;padding:13px 22px;font-size:15.5px;font-weight:600;border-radius:var(--radius);border:1px solid var(--ink)}
   .btn-solid{background:var(--ink);color:#fff}
   .btn-solid:hover{background:#0D1720}
   .btn-line{background:transparent;color:var(--ink)}
   .btn-line:hover{background:rgba(22,32,43,.05)}
-  .diagram{border:1px solid var(--rule);padding:22px 20px 18px;background:var(--paper)}
+  .diagram{border:1px solid var(--rule);padding:var(--panel-pad) 20px 18px;background:var(--paper)}
   .diagram h3{font-size:15.5px;font-weight:600}
   .diagram p{font-size:14px;color:var(--ink-soft);margin:10px 0 0;line-height:1.5}
   .diagram svg{width:100%;height:auto;display:block;margin-top:14px}
@@ -69,7 +110,7 @@
   .fig span{display:block;margin-top:8px;font-size:14px;color:var(--ink-soft);line-height:1.4}
 
   /* ---------- sections ---------- */
-  section{padding:64px 0;border-bottom:1px solid var(--rule)}
+  section{padding:var(--section-space) 0;border-bottom:1px solid var(--rule)}
   .shead{max-width:var(--measure)}
   .shead p{margin-top:14px;color:var(--ink-soft);font-size:17px}
 
@@ -84,14 +125,16 @@
     padding:15px 20px;cursor:pointer;align-items:center;font:inherit;box-sizing:border-box;
   }
   .row button:hover{background:#F6F8F7}
+  .row button{transition:background .18s ease}
+  .caret{display:inline-block;transition:transform .3s cubic-bezier(.22,.61,.36,1)}
+  .row.open .caret{transform:rotate(45deg)}
   .why{font-size:15px;color:var(--ink-soft)}
   .tag{justify-self:start;font-size:13px;font-weight:600;padding:4px 10px;border-radius:2px;border:1px solid}
   .t-cleared{color:var(--cleared);border-color:rgba(20,103,90,.5);background:rgba(20,103,90,.07)}
   .t-held{color:var(--held);border-color:rgba(169,116,26,.5);background:rgba(169,116,26,.08)}
   .t-stopped{color:var(--stopped);border-color:rgba(138,46,34,.45);background:rgba(138,46,34,.07)}
-  .body{display:none;padding:2px 20px 20px}
-  .row.open .body{display:block}
-  .body ol{margin:0;padding-left:20px;max-width:74ch}
+  .body{max-height:0;overflow:hidden;transition:max-height .34s cubic-bezier(.22,.61,.36,1)}
+  .body ol{margin:0;padding:2px 20px 20px 40px;max-width:74ch}
   .body li{margin-bottom:7px;font-size:15.5px;line-height:1.55}
   .row .caret{font-weight:700;color:var(--ink-soft)}
   .hint{margin-top:14px;font-size:14.5px;color:var(--ink-soft)}
@@ -119,7 +162,7 @@
   td:first-child{font-weight:600}
 
   /* ---------- rail ---------- */
-  .rail{margin-top:28px;border:1px solid var(--rule);background:var(--panel);padding:26px 22px}
+  .rail{margin-top:28px;border:1px solid var(--rule);background:var(--panel);padding:var(--panel-pad)}
   .rail svg{width:100%;height:auto;display:block}
   .rail p{margin:16px 0 0;font-size:15px;color:var(--ink-soft)}
 
@@ -143,6 +186,10 @@
     .controls,.two{grid-template-columns:1fr;gap:0}
     .two{gap:48px}
   }
+  @media (max-width:760px){
+    .nav-links a:not(.nav-cta){display:none}
+    .nav-in{padding:0 20px;height:54px}
+  }
   @media (max-width:640px){
     body{font-size:16px}
     .wrap{padding:0 20px}
@@ -157,7 +204,21 @@
 </head>
 <body>
 
-<header>
+<nav class="nav" id="nav">
+  <div class="nav-in">
+    <a href="#top" class="nav-name" style="border:0;color:var(--ink)">Adib Humaidi</a>
+    <div class="nav-links">
+      <a href="#playbook">Playbook</a>
+      <a href="#work">Work</a>
+      <a href="#controls">Controls</a>
+      <a href="#systems">Systems</a>
+      <a href="#about">About</a>
+      <a class="nav-cta" href="resume.pdf">Resume</a>
+    </div>
+  </div>
+</nav>
+
+<header id="top">
   <div class="wrap">
     <div class="hero">
       <div>
@@ -173,25 +234,29 @@
 
       <div class="diagram">
         <h3>Where my work sits</h3>
-        <svg viewBox="0 0 320 176" role="img" aria-label="Diagram: purchase order, goods receipt and invoice feed a three-way match. Matched items post for payment; mismatched items become exceptions that I resolve.">
-          <g fill="none" stroke="#C7D0CE" stroke-width="1">
+        <svg id="dg" viewBox="0 0 320 176" role="img" aria-label="Diagram: purchase order, goods receipt and invoice feed a three-way match. Matched items post for payment; mismatched items become exceptions that I resolve.">
+          <g class="dg-box" fill="none" stroke="#C7D0CE" stroke-width="1">
             <rect x="1" y="8" width="96" height="34"/><rect x="1" y="60" width="96" height="34"/><rect x="1" y="112" width="96" height="34"/>
           </g>
-          <g fill="#16202B" font-family="Archivo,Arial,sans-serif" font-size="12.5" font-weight="600">
+          <g class="dg-label" fill="#16202B" font-family="Archivo,Arial,sans-serif" font-size="12.5" font-weight="600">
             <text x="14" y="30">Purchase order</text><text x="14" y="82">Goods receipt</text><text x="14" y="134">Vendor invoice</text>
           </g>
           <g fill="none" stroke="#4A5A66" stroke-width="1.2">
-            <path d="M97 25 H132 V70 H150"/><path d="M97 77 H150"/><path d="M97 129 H132 V84 H150"/>
+            <path class="dg-line" d="M97 25 H132 V70 H150"/><path class="dg-line" d="M97 77 H150"/><path class="dg-line" d="M97 129 H132 V84 H150"/>
           </g>
-          <rect x="150" y="55" width="80" height="44" fill="#fff" stroke="#16202B" stroke-width="1.4"/>
-          <text x="163" y="73" fill="#16202B" font-family="Archivo,Arial,sans-serif" font-size="12.5" font-weight="700">Three-way</text>
-          <text x="163" y="89" fill="#16202B" font-family="Archivo,Arial,sans-serif" font-size="12.5" font-weight="700">match</text>
-          <path d="M230 68 H268" fill="none" stroke="#14675A" stroke-width="1.6"/>
-          <path d="M230 86 H252 V132 H268" fill="none" stroke="#A9741A" stroke-width="1.6" stroke-dasharray="4 3"/>
-          <text x="272" y="64" fill="#14675A" font-family="Archivo,Arial,sans-serif" font-size="12" font-weight="700">Posts</text>
-          <text x="272" y="79" fill="#14675A" font-family="Archivo,Arial,sans-serif" font-size="12" font-weight="700">to pay</text>
-          <text x="272" y="128" fill="#A9741A" font-family="Archivo,Arial,sans-serif" font-size="12" font-weight="700">My</text>
-          <text x="272" y="143" fill="#A9741A" font-family="Archivo,Arial,sans-serif" font-size="12" font-weight="700">queue</text>
+          <g class="dg-match">
+            <rect x="150" y="55" width="80" height="44" fill="#fff" stroke="#16202B" stroke-width="1.4"/>
+            <text x="163" y="73" fill="#16202B" font-family="Archivo,Arial,sans-serif" font-size="12.5" font-weight="700">Three-way</text>
+            <text x="163" y="89" fill="#16202B" font-family="Archivo,Arial,sans-serif" font-size="12.5" font-weight="700">match</text>
+          </g>
+          <g class="dg-out">
+            <path d="M230 68 H268" fill="none" stroke="#14675A" stroke-width="1.6"/>
+            <path d="M230 86 H252 V132 H268" fill="none" stroke="#A9741A" stroke-width="1.6" stroke-dasharray="4 3"/>
+            <text x="272" y="64" fill="#14675A" font-family="Archivo,Arial,sans-serif" font-size="12" font-weight="700">Posts</text>
+            <text x="272" y="79" fill="#14675A" font-family="Archivo,Arial,sans-serif" font-size="12" font-weight="700">to pay</text>
+            <text x="272" y="128" fill="#A9741A" font-family="Archivo,Arial,sans-serif" font-size="12" font-weight="700">My</text>
+            <text x="272" y="143" fill="#A9741A" font-family="Archivo,Arial,sans-serif" font-size="12" font-weight="700">queue</text>
+          </g>
         </svg>
         <p>Straight-through invoices post themselves. The value of an AP analyst is in the exception queue — that is where I've spent my internship.</p>
       </div>
@@ -199,7 +264,7 @@
   </div>
 </header>
 
-<div class="figures wrap" style="max-width:1080px">
+<div class="figures wrap">
   <div class="fig"><b>400+</b><span>Vendor invoices processed weekly</span></div>
   <div class="fig"><b>94–96%</b><span>First-pass accuracy on invoice entry</span></div>
   <div class="fig"><b>2</b><span>Recurring system defects found and escalated to resolution</span></div>
@@ -208,6 +273,11 @@
 
 <main>
 
+
+<!-- ====== MULA SECTION: PLAYBOOK — 10 sebab invoice tersangkut ======
+     Nak pindah section ni? Potong dari sini sampai jumpa
+     "HABIS SECTION: PLAYBOOK", lepas tu tampal kat tempat baru.
+     Nak buang? Padam semua sekali. -->
 <section id="playbook">
   <div class="wrap">
     <div class="shead">
@@ -376,7 +446,14 @@
     <p class="hint">Written from general P2P practice. No employer, vendor or invoice data appears anywhere on this site.</p>
   </div>
 </section>
+<!-- ====== HABIS SECTION: PLAYBOOK ====== -->
 
+
+
+<!-- ====== MULA SECTION: PROOF OF WORK — 3 case study ======
+     Nak pindah section ni? Potong dari sini sampai jumpa
+     "HABIS SECTION: WORK", lepas tu tampal kat tempat baru.
+     Nak buang? Padam semua sekali. -->
 <section id="work">
   <div class="wrap">
     <div class="shead">
@@ -442,7 +519,14 @@
     </div>
   </div>
 </section>
+<!-- ====== HABIS SECTION: WORK ====== -->
 
+
+
+<!-- ====== MULA SECTION: CONTROLS — kawalan yang aku ikut ======
+     Nak pindah section ni? Potong dari sini sampai jumpa
+     "HABIS SECTION: CONTROLS", lepas tu tampal kat tempat baru.
+     Nak buang? Padam semua sekali. -->
 <section id="controls">
   <div class="wrap">
     <div class="shead">
@@ -461,7 +545,14 @@
     </ul>
   </div>
 </section>
+<!-- ====== HABIS SECTION: CONTROLS ====== -->
 
+
+
+<!-- ====== MULA SECTION: SYSTEMS — table tools ======
+     Nak pindah section ni? Potong dari sini sampai jumpa
+     "HABIS SECTION: SYSTEMS", lepas tu tampal kat tempat baru.
+     Nak buang? Padam semua sekali. -->
 <section id="systems">
   <div class="wrap">
     <div class="shead">
@@ -482,7 +573,14 @@
     </table>
   </div>
 </section>
+<!-- ====== HABIS SECTION: SYSTEMS ====== -->
 
+
+
+<!-- ====== MULA SECTION: CYCLE — diagram P2P penuh ======
+     Nak pindah section ni? Potong dari sini sampai jumpa
+     "HABIS SECTION: CYCLE", lepas tu tampal kat tempat baru.
+     Nak buang? Padam semua sekali. -->
 <section id="cycle">
   <div class="wrap">
     <div class="shead">
@@ -530,7 +628,14 @@
     </div>
   </div>
 </section>
+<!-- ====== HABIS SECTION: CYCLE ====== -->
 
+
+
+<!-- ====== MULA SECTION: ABOUT — pasal aku + credentials ======
+     Nak pindah section ni? Potong dari sini sampai jumpa
+     "HABIS SECTION: ABOUT", lepas tu tampal kat tempat baru.
+     Nak buang? Padam semua sekali. -->
 <section id="about">
   <div class="wrap two">
     <div>
@@ -550,6 +655,8 @@
     </div>
   </div>
 </section>
+<!-- ====== HABIS SECTION: ABOUT ====== -->
+
 
 </main>
 
@@ -568,15 +675,54 @@
 </footer>
 
 <script>
+(function () {
+  var calm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* playbook rows: expand to their real height so the motion is smooth */
   document.querySelectorAll('.row button').forEach(function (btn) {
+    var row = btn.closest('.row');
+    var body = row.querySelector('.body');
     btn.addEventListener('click', function () {
-      var row = btn.closest('.row');
       var open = row.classList.toggle('open');
       btn.setAttribute('aria-expanded', open ? 'true' : 'false');
-      var caret = btn.querySelector('.caret');
-      if (caret) caret.textContent = open ? '\u2212' : '+';
+      body.style.maxHeight = open ? (body.scrollHeight + 'px') : '0px';
     });
   });
+  window.addEventListener('resize', function () {
+    document.querySelectorAll('.row.open .body').forEach(function (b) {
+      b.style.maxHeight = b.scrollHeight + 'px';
+    });
+  });
+
+  /* diagram draws itself once, just after the page settles */
+  var dg = document.getElementById('dg');
+  if (dg) {
+    if (calm) { dg.classList.add('drawn'); dg.querySelectorAll('.dg-box,.dg-label,.dg-match,.dg-out').forEach(function(el){el.style.opacity=1;}); dg.querySelectorAll('.dg-line').forEach(function(el){el.style.strokeDashoffset=0;}); }
+    else { setTimeout(function () { dg.classList.add('drawn'); }, 250); }
+  }
+
+  /* nav appears once the hero is behind you */
+  var nav = document.getElementById('nav');
+  var header = document.getElementById('top');
+  window.addEventListener('scroll', function () {
+    var past = window.scrollY > (header.offsetHeight - 80);
+    nav.classList.toggle('show', past);
+  }, { passive: true });
+
+  /* highlight the section being read */
+  var links = Array.prototype.slice.call(document.querySelectorAll('.nav-links a[href^="#"]'));
+  var targets = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+  if ('IntersectionObserver' in window) {
+    var obs = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (!e.isIntersecting) return;
+        var i = targets.indexOf(e.target);
+        links.forEach(function (a, j) { a.classList.toggle('active', i === j); });
+      });
+    }, { rootMargin: '-58px 0px -70% 0px' });
+    targets.forEach(function (t) { if (t) obs.observe(t); });
+  }
+})();
 </script>
 </body>
 </html>
