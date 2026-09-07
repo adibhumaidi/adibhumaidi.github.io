@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Adib Humaidi — Accounts Payable / P2P Invoicing</title>
+<meta name="description" content="Entry-level accounts payable and P2P invoicing. SAP S/4HANA, EMEA and LATAM. Exception handling, payment controls, and reconciliation tooling. Available from October 2026, Kuala Lumpur.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#16202B;
+    --ink-soft:#4A5A66;
+    --paper:#F1F3F2;
+    --panel:#FFFFFF;
+    --rule:#C7D0CE;
+    --cleared:#14675A;
+    --held:#A9741A;
+    --stopped:#8A2E22;
+    --measure:66ch;
+  }
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Archivo',"Helvetica Neue",Arial,system-ui,sans-serif;
+    font-size:17px;
+    line-height:1.6;
+    font-weight:400;
+  }
+  .wrap{max-width:1080px;margin:0 auto;padding:0 28px}
+  a{color:var(--cleared);text-decoration:none;border-bottom:1px solid rgba(20,103,90,.35)}
+  a:hover{border-bottom-color:var(--cleared)}
+  a:focus-visible,button:focus-visible{outline:2px solid var(--cleared);outline-offset:3px}
+  h1,h2,h3{font-weight:700;letter-spacing:-.02em;line-height:1.12;margin:0}
+  h2{font-size:clamp(24px,3.4vw,32px)}
+  h3{font-size:19px;letter-spacing:-.01em}
+  p{margin:0 0 14px;max-width:var(--measure)}
+  .lede{font-size:18px;color:var(--ink-soft)}
+
+  /* ---------- hero ---------- */
+  header{border-bottom:1px solid var(--rule);background:var(--panel)}
+  .hero{display:grid;grid-template-columns:1.25fr .85fr;gap:56px;padding:64px 0 56px;align-items:start}
+  .name{font-size:clamp(38px,6vw,64px);font-weight:700;letter-spacing:-.035em}
+  .role{font-size:clamp(19px,2.3vw,23px);font-weight:500;margin-top:14px;color:var(--ink);max-width:34ch;line-height:1.32}
+  .hero p.lede{margin-top:18px}
+  .status{display:inline-flex;align-items:center;gap:10px;margin-top:6px;padding:7px 14px 7px 12px;
+    border:1px solid var(--cleared);color:var(--cleared);border-radius:2px;font-size:14.5px;font-weight:600}
+  .dot{width:8px;height:8px;background:var(--cleared);border-radius:50%;flex:none}
+  .actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:28px}
+  .btn{display:inline-block;padding:13px 22px;font-size:15.5px;font-weight:600;border-radius:2px;border:1px solid var(--ink)}
+  .btn-solid{background:var(--ink);color:#fff}
+  .btn-solid:hover{background:#0D1720}
+  .btn-line{background:transparent;color:var(--ink)}
+  .btn-line:hover{background:rgba(22,32,43,.05)}
+  .diagram{border:1px solid var(--rule);padding:22px 20px 18px;background:var(--paper)}
+  .diagram h3{font-size:15.5px;font-weight:600}
+  .diagram p{font-size:14px;color:var(--ink-soft);margin:10px 0 0;line-height:1.5}
+  .diagram svg{width:100%;height:auto;display:block;margin-top:14px}
+
+  /* ---------- figures ---------- */
+  .figures{display:grid;grid-template-columns:repeat(4,1fr);border-bottom:1px solid var(--rule);background:var(--panel)}
+  .fig{padding:26px 24px;border-left:1px solid var(--rule)}
+  .fig:first-child{border-left:0}
+  .fig b{display:block;font-size:30px;font-weight:700;letter-spacing:-.03em;line-height:1}
+  .fig span{display:block;margin-top:8px;font-size:14px;color:var(--ink-soft);line-height:1.4}
+
+  /* ---------- sections ---------- */
+  section{padding:64px 0;border-bottom:1px solid var(--rule)}
+  .shead{max-width:var(--measure)}
+  .shead p{margin-top:14px;color:var(--ink-soft);font-size:17px}
+
+  /* ---------- playbook ---------- */
+  .playbook{margin-top:32px;border:1px solid var(--rule);background:var(--panel)}
+  .pb-top{display:grid;grid-template-columns:1.5fr 1fr 118px;gap:16px;padding:12px 20px;
+    border-bottom:1px solid var(--rule);font-size:14px;font-weight:600;color:var(--ink-soft)}
+  .row{border-bottom:1px solid #E4E9E8}
+  .row:last-child{border-bottom:0}
+  .row button{
+    all:unset;display:grid;grid-template-columns:1.5fr 1fr 118px;gap:16px;width:100%;
+    padding:15px 20px;cursor:pointer;align-items:center;font:inherit;box-sizing:border-box;
+  }
+  .row button:hover{background:#F6F8F7}
+  .why{font-size:15px;color:var(--ink-soft)}
+  .tag{justify-self:start;font-size:13px;font-weight:600;padding:4px 10px;border-radius:2px;border:1px solid}
+  .t-cleared{color:var(--cleared);border-color:rgba(20,103,90,.5);background:rgba(20,103,90,.07)}
+  .t-held{color:var(--held);border-color:rgba(169,116,26,.5);background:rgba(169,116,26,.08)}
+  .t-stopped{color:var(--stopped);border-color:rgba(138,46,34,.45);background:rgba(138,46,34,.07)}
+  .body{display:none;padding:2px 20px 20px}
+  .row.open .body{display:block}
+  .body ol{margin:0;padding-left:20px;max-width:74ch}
+  .body li{margin-bottom:7px;font-size:15.5px;line-height:1.55}
+  .row .caret{font-weight:700;color:var(--ink-soft)}
+  .hint{margin-top:14px;font-size:14.5px;color:var(--ink-soft)}
+
+  /* ---------- case studies ---------- */
+  .case{display:grid;grid-template-columns:190px 1fr;gap:36px;padding:34px 0;border-top:1px solid var(--rule)}
+  .case:first-of-type{border-top:0;padding-top:24px}
+  .case-side p{font-size:14.5px;color:var(--ink-soft);margin:8px 0 0;line-height:1.5}
+  .case h3{margin-bottom:12px}
+  .kv{margin:0 0 12px;max-width:74ch}
+  .kv dt{font-size:14px;font-weight:600;color:var(--ink-soft);margin-bottom:2px}
+  .kv dd{margin:0 0 12px;font-size:16px;line-height:1.55}
+  .result{border-left:3px solid var(--cleared);padding:2px 0 2px 14px;font-weight:500}
+
+  /* ---------- controls ---------- */
+  .controls{list-style:none;margin:28px 0 0;padding:0;display:grid;grid-template-columns:1fr 1fr;gap:0 40px}
+  .controls li{padding:16px 0;border-top:1px solid var(--rule);font-size:16px;line-height:1.55}
+  .controls li b{font-weight:600}
+
+  /* ---------- table ---------- */
+  table{width:100%;border-collapse:collapse;margin-top:28px;background:var(--panel);border:1px solid var(--rule)}
+  th,td{text-align:left;padding:13px 18px;border-bottom:1px solid #E4E9E8;font-size:15.5px;vertical-align:top}
+  th{font-size:14px;font-weight:600;color:var(--ink-soft);border-bottom:1px solid var(--rule)}
+  tr:last-child td{border-bottom:0}
+  td:first-child{font-weight:600}
+
+  /* ---------- rail ---------- */
+  .rail{margin-top:28px;border:1px solid var(--rule);background:var(--panel);padding:26px 22px}
+  .rail svg{width:100%;height:auto;display:block}
+  .rail p{margin:16px 0 0;font-size:15px;color:var(--ink-soft)}
+
+  /* ---------- about / creds ---------- */
+  .two{display:grid;grid-template-columns:1fr 1fr;gap:56px}
+  .creds{list-style:none;margin:0;padding:0}
+  .creds li{padding:14px 0;border-top:1px solid var(--rule);font-size:16px;line-height:1.5}
+  .creds li:first-child{border-top:0;padding-top:0}
+  .creds em{font-style:normal;display:block;color:var(--ink-soft);font-size:14.5px;margin-top:3px}
+
+  footer{padding:56px 0 72px;background:var(--panel)}
+  .contact{display:flex;flex-wrap:wrap;gap:14px 40px;margin-top:22px;font-size:17px}
+  .legal{margin-top:40px;font-size:14px;color:var(--ink-soft);max-width:78ch;line-height:1.55}
+
+  @media (max-width:900px){
+    .hero{grid-template-columns:1fr;gap:34px;padding:48px 0 44px}
+    .figures{grid-template-columns:1fr 1fr}
+    .fig:nth-child(3){border-left:0}
+    .fig:nth-child(n+3){border-top:1px solid var(--rule)}
+    .case{grid-template-columns:1fr;gap:16px}
+    .controls,.two{grid-template-columns:1fr;gap:0}
+    .two{gap:48px}
+  }
+  @media (max-width:640px){
+    body{font-size:16px}
+    .wrap{padding:0 20px}
+    .pb-top{display:none}
+    .row button{grid-template-columns:1fr 84px;gap:10px;padding:14px 16px}
+    .row .why{display:none}
+    .body{padding:0 16px 18px}
+    table{display:block;overflow-x:auto}
+  }
+  @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <div class="hero">
+      <div>
+        <h1 class="name">Adib Humaidi</h1>
+        <p class="role">Accounts payable and P2P invoicing — SAP S/4HANA, EMEA and LATAM.</p>
+        <p class="lede">I process the invoices that go through, and I document how to clear the ones that don't. Currently finishing a P2P invoicing internship at Eli Lilly's Global Business Solutions centre in Kuala Lumpur.</p>
+        <span class="status"><span class="dot"></span>Available full-time from October 2026 · Klang Valley</span>
+        <div class="actions">
+          <a class="btn btn-solid" href="resume.pdf">Download my resume</a>
+          <a class="btn btn-line" href="#playbook">See how I clear a blocked invoice</a>
+        </div>
+      </div>
+
+      <div class="diagram">
+        <h3>Where my work sits</h3>
+        <svg viewBox="0 0 320 176" role="img" aria-label="Diagram: purchase order, goods receipt and invoice feed a three-way match. Matched items post for payment; mismatched items become exceptions that I resolve.">
+          <g fill="none" stroke="#C7D0CE" stroke-width="1">
+            <rect x="1" y="8" width="96" height="34"/><rect x="1" y="60" width="96" height="34"/><rect x="1" y="112" width="96" height="34"/>
+          </g>
+          <g fill="#16202B" font-family="Archivo,Arial,sans-serif" font-size="12.5" font-weight="600">
+            <text x="14" y="30">Purchase order</text><text x="14" y="82">Goods receipt</text><text x="14" y="134">Vendor invoice</text>
+          </g>
+          <g fill="none" stroke="#4A5A66" stroke-width="1.2">
+            <path d="M97 25 H132 V70 H150"/><path d="M97 77 H150"/><path d="M97 129 H132 V84 H150"/>
+          </g>
+          <rect x="150" y="55" width="80" height="44" fill="#fff" stroke="#16202B" stroke-width="1.4"/>
+          <text x="163" y="73" fill="#16202B" font-family="Archivo,Arial,sans-serif" font-size="12.5" font-weight="700">Three-way</text>
+          <text x="163" y="89" fill="#16202B" font-family="Archivo,Arial,sans-serif" font-size="12.5" font-weight="700">match</text>
+          <path d="M230 68 H268" fill="none" stroke="#14675A" stroke-width="1.6"/>
+          <path d="M230 86 H252 V132 H268" fill="none" stroke="#A9741A" stroke-width="1.6" stroke-dasharray="4 3"/>
+          <text x="272" y="64" fill="#14675A" font-family="Archivo,Arial,sans-serif" font-size="12" font-weight="700">Posts</text>
+          <text x="272" y="79" fill="#14675A" font-family="Archivo,Arial,sans-serif" font-size="12" font-weight="700">to pay</text>
+          <text x="272" y="128" fill="#A9741A" font-family="Archivo,Arial,sans-serif" font-size="12" font-weight="700">My</text>
+          <text x="272" y="143" fill="#A9741A" font-family="Archivo,Arial,sans-serif" font-size="12" font-weight="700">queue</text>
+        </svg>
+        <p>Straight-through invoices post themselves. The value of an AP analyst is in the exception queue — that is where I've spent my internship.</p>
+      </div>
+    </div>
+  </div>
+</header>
+
+<div class="figures wrap" style="max-width:1080px">
+  <div class="fig"><b>400+</b><span>Vendor invoices processed weekly</span></div>
+  <div class="fig"><b>94–96%</b><span>First-pass accuracy on invoice entry</span></div>
+  <div class="fig"><b>2</b><span>Recurring system defects found and escalated to resolution</span></div>
+  <div class="fig"><b>2</b><span>Regions supported end to end: EMEA and LATAM</span></div>
+</div>
+
+<main>
+
+<section id="playbook">
+  <div class="wrap">
+    <div class="shead">
+      <h2>My invoice exception playbook</h2>
+      <p>Ten reasons an invoice stops moving, and what I do about each one. This is the working reference I use for EMEA and LATAM invoicing. Open a row to see the resolution path.</p>
+    </div>
+
+    <div class="playbook">
+      <div class="pb-top">
+        <div>Block reason</div><div>What usually causes it</div><div>Outcome</div>
+      </div>
+
+      <div class="row">
+        <button type="button" aria-expanded="false">
+          <span><strong>Price variance</strong></span>
+          <span class="why">Invoice unit price above the PO line price</span>
+          <span><span class="tag t-cleared">Release</span> <span class="caret">+</span></span>
+        </button>
+        <div class="body">
+          <ol>
+            <li>Compare invoice line price against the PO line price, not the PO total — a total can net off two errors.</li>
+            <li>If the difference sits inside the agreed tolerance, release the block and post.</li>
+            <li>If it sits outside, send the buyer the PO number, both prices and the variance value, and ask for either a PO amendment or a vendor credit note.</li>
+            <li>Park the invoice while waiting so it stays visible in the aging report instead of sitting in an inbox.</li>
+          </ol>
+        </div>
+      </div>
+
+      <div class="row">
+        <button type="button" aria-expanded="false">
+          <span><strong>Quantity variance</strong></span>
+          <span class="why">Invoiced quantity exceeds the quantity received</span>
+          <span><span class="tag t-held">Hold</span> <span class="caret">+</span></span>
+        </button>
+        <div class="body">
+          <ol>
+            <li>Check whether this is over-invoicing or a delivery that arrived in parts and hasn't been fully receipted.</li>
+            <li>Ask the receiving site to confirm what physically arrived and post the outstanding goods receipt.</li>
+            <li>Pay only the received quantity; leave the balance open against the PO rather than crediting and re-invoicing.</li>
+          </ol>
+        </div>
+      </div>
+
+      <div class="row">
+        <button type="button" aria-expanded="false">
+          <span><strong>No goods receipt</strong></span>
+          <span class="why">Nobody has confirmed the goods or service was delivered</span>
+          <span><span class="tag t-held">Hold</span> <span class="caret">+</span></span>
+        </button>
+        <div class="body">
+          <ol>
+            <li>For goods, chase the requisitioner or warehouse for the GR posting.</li>
+            <li>For services, the equivalent confirmation is an approved service entry — chase the approver, not the vendor.</li>
+            <li>Never post around a missing receipt. It breaks the match and removes the only evidence that the company received what it is paying for.</li>
+          </ol>
+        </div>
+      </div>
+
+      <div class="row">
+        <button type="button" aria-expanded="false">
+          <span><strong>No purchase order quoted</strong></span>
+          <span class="why">Unplanned or non-PO spend billed directly to the business</span>
+          <span><span class="tag t-held">Hold</span> <span class="caret">+</span></span>
+        </button>
+        <div class="body">
+          <ol>
+            <li>Identify the cost centre owner from the invoice and confirm the spend was actually authorised.</li>
+            <li>Route it through the non-PO approval matrix, or ask the buyer to raise a retrospective PO where policy allows one.</li>
+            <li>Flag repeat offenders. A vendor billing without a PO every month is a process gap, not ten separate incidents.</li>
+          </ol>
+        </div>
+      </div>
+
+      <div class="row">
+        <button type="button" aria-expanded="false">
+          <span><strong>Possible duplicate</strong></span>
+          <span class="why">Same vendor, amount and invoice reference already in the ledger</span>
+          <span><span class="tag t-stopped">Reject</span> <span class="caret">+</span></span>
+        </button>
+        <div class="body">
+          <ol>
+            <li>Search posted documents on vendor plus invoice number, then again on vendor plus amount plus date — a re-keyed reference defeats the first search.</li>
+            <li>If the original is posted and unpaid, reject the second copy and tell the vendor the reference it is already booked under.</li>
+            <li>If a credit note has reversed the original, the resubmission may be valid — document why before posting.</li>
+            <li>Duplicate payments are the single easiest way for cash to leave the business unnoticed, so this check runs before entry, not after.</li>
+          </ol>
+        </div>
+      </div>
+
+      <div class="row">
+        <button type="button" aria-expanded="false">
+          <span><strong>Bank details differ from vendor master</strong></span>
+          <span class="why">Invoice or email quotes an account that isn't on file</span>
+          <span><span class="tag t-stopped">Stop</span> <span class="caret">+</span></span>
+        </button>
+        <div class="body">
+          <ol>
+            <li>Treat this as a suspected payment fraud attempt until proven otherwise. Do not pay to the new account.</li>
+            <li>Verify by calling the vendor on the number already held in the master data — never a number or address supplied in the same request.</li>
+            <li>Send the change to the vendor master team. AP raises it; AP does not amend it.</li>
+            <li>Report it even when it turns out to be genuine, so the pattern is visible to the wider team.</li>
+          </ol>
+        </div>
+      </div>
+
+      <div class="row">
+        <button type="button" aria-expanded="false">
+          <span><strong>Incorrect tax treatment</strong></span>
+          <span class="why">Wrong VAT rate or code on a cross-border EMEA invoice</span>
+          <span><span class="tag t-stopped">Reject</span> <span class="caret">+</span></span>
+        </button>
+        <div class="body">
+          <ol>
+            <li>Check the vendor's tax registration and the place of supply before touching the code.</li>
+            <li>Where the invoice is not tax-compliant for the receiving country, request a corrected document rather than adjusting the code to make it post.</li>
+            <li>An invoice forced through with the wrong code becomes a recovery problem at year end, and it lands on someone else's desk.</li>
+          </ol>
+        </div>
+      </div>
+
+      <div class="row">
+        <button type="button" aria-expanded="false">
+          <span><strong>Vendor blocked or not created</strong></span>
+          <span class="why">Master record missing, incomplete or blocked for payment</span>
+          <span><span class="tag t-held">Hold</span> <span class="caret">+</span></span>
+        </button>
+        <div class="body">
+          <ol>
+            <li>Find out why the block exists before asking for it to be lifted — it is often deliberate.</li>
+            <li>Send incomplete records to the master data owner with the documents they need, and keep the invoice parked in the meantime.</li>
+            <li>Vendor creation and invoice processing stay in separate hands. That separation is the control.</li>
+          </ol>
+        </div>
+      </div>
+
+      <div class="row">
+        <button type="button" aria-expanded="false">
+          <span><strong>Payment terms mismatch</strong></span>
+          <span class="why">Invoice states terms that differ from the contract or PO</span>
+          <span><span class="tag t-cleared">Correct and release</span> <span class="caret">+</span></span>
+        </button>
+        <div class="body">
+          <ol>
+            <li>Contract and PO terms take precedence over whatever the vendor prints on the invoice.</li>
+            <li>Correct the terms at entry so the due date is right first time, rather than fixing it later in the payment run.</li>
+            <li>Where the vendor disputes it, hand the exchange to procurement with the PO reference — commercial terms aren't AP's to renegotiate.</li>
+          </ol>
+        </div>
+      </div>
+
+      <div class="row">
+        <button type="button" aria-expanded="false">
+          <span><strong>Missing statutory invoice fields</strong></span>
+          <span class="why">LATAM e-invoicing and local content requirements not met</span>
+          <span><span class="tag t-stopped">Reject</span> <span class="caret">+</span></span>
+        </button>
+        <div class="body">
+          <ol>
+            <li>Several LATAM markets require specific fields and validated e-invoice references before a document is legally payable.</li>
+            <li>Reject early with a precise list of what's missing. A vague rejection just returns the same invoice a week later.</li>
+            <li>Log the reason by country. Recurring rejections from one market usually mean the vendor was onboarded with the wrong billing instructions.</li>
+          </ol>
+        </div>
+      </div>
+    </div>
+    <p class="hint">Written from general P2P practice. No employer, vendor or invoice data appears anywhere on this site.</p>
+  </div>
+</section>
+
+<section id="work">
+  <div class="wrap">
+    <div class="shead">
+      <h2>Proof of work</h2>
+      <p>Three things I built or resolved during my internship, described without any confidential data. Sample files are rebuilt from scratch with invented figures.</p>
+    </div>
+
+    <div class="case">
+      <div class="case-side">
+        <h3 style="font-size:15.5px;font-weight:600">Validation tracker</h3>
+        <p>Excel, Power Query<br>Built in week 6, still in use</p>
+      </div>
+      <div>
+        <h3>A live tracker that replaced a manual daily count</h3>
+        <dl class="kv">
+          <dt>Situation</dt>
+          <dd>Invoice validation volumes across a group of LATAM markets were being counted by hand each day, which made the daily figure slow to produce and easy to get wrong.</dd>
+          <dt>What I did</dt>
+          <dd>Built a single workbook that grouped markets into two zones, pulled the raw extract in through Power Query, and calculated volumes and aging with live formulas instead of re-typed totals. Set it up so a refresh replaced the whole manual step.</dd>
+          <dt>Result</dt>
+          <dd class="result">The daily figure became a refresh rather than a recount, and the team gained visibility of which markets were building a backlog before it showed up in the aging report.</dd>
+        </dl>
+        <p><a href="samples/validation-tracker-sample.xlsx">Open the sample workbook</a> — same structure and formulas, invented countries and figures.</p>
+      </div>
+    </div>
+
+    <div class="case">
+      <div class="case-side">
+        <h3 style="font-size:15.5px;font-weight:600">Defect escalation</h3>
+        <p>Cloud invoice capture tool<br>Two defects, both resolved</p>
+      </div>
+      <div>
+        <h3>Two recurring system faults, evidenced and escalated</h3>
+        <dl class="kv">
+          <dt>Situation</dt>
+          <dd>A cloud document-capture tool was intermittently mishandling certain document types. The symptom looked like ordinary keying error, so it was being corrected invoice by invoice rather than reported.</dd>
+          <dt>What I did</dt>
+          <dd>Logged each occurrence with the document type and conditions until the pattern was clear enough to distinguish a system fault from human error, then raised it through the support workflow with reproducible evidence rather than a description.</dd>
+          <dt>Result</dt>
+          <dd class="result">Both defects were accepted and fixed, which removed a recurring rework loop for every processor on the queue rather than only for me.</dd>
+        </dl>
+        <p>The lesson I took from it: three identical mistakes in a week are rarely three mistakes.</p>
+      </div>
+    </div>
+
+    <div class="case">
+      <div class="case-side">
+        <h3 style="font-size:15.5px;font-weight:600">Exception playbook</h3>
+        <p>Reference document<br>Written for my own handover</p>
+      </div>
+      <div>
+        <h3>The reference I wrote so the next person starts faster</h3>
+        <dl class="kv">
+          <dt>Situation</dt>
+          <dd>Block reasons and their resolution paths were held largely in people's heads, which made ramp-up slow and meant the same question got asked repeatedly.</dd>
+          <dt>What I did</dt>
+          <dd>Documented the block reasons I met most often as a decision path — what to check, what evidence to gather, who owns the next step, and when to reject rather than chase. It's published in full at the top of this page.</dd>
+          <dt>Result</dt>
+          <dd class="result">A new processor can work out the next action on a blocked invoice without interrupting someone, and the routing stays consistent across the team.</dd>
+        </dl>
+        <p><a href="#playbook">Read the playbook</a></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="controls">
+  <div class="wrap">
+    <div class="shead">
+      <h2>Controls I work to</h2>
+      <p>Accounts payable is where cash leaves the company, so most of the job is knowing which steps are not negotiable.</p>
+    </div>
+    <ul class="controls">
+      <li><b>Three-way match integrity.</b> Purchase order, receipt and invoice agree before posting, or the invoice waits.</li>
+      <li><b>Duplicate detection before entry.</b> Checked on reference, and again on vendor, amount and date.</li>
+      <li><b>Separation of duties.</b> The person who processes invoices does not create or amend vendor master records.</li>
+      <li><b>Bank detail changes verified independently.</b> Confirmed on a number already held on file, never one supplied with the request.</li>
+      <li><b>Tolerances applied, not stretched.</b> Anything outside the threshold goes to the buyer with the numbers attached.</li>
+      <li><b>Invoice date and posting date kept distinct.</b> Wrong dates distort aging, due dates and period cut-off.</li>
+      <li><b>Approval matrix respected on non-PO spend.</b> An urgent invoice is still an unapproved invoice.</li>
+      <li><b>Rejections given a reason and a record.</b> So the pattern is visible and the vendor can actually fix it.</li>
+    </ul>
+  </div>
+</section>
+
+<section id="systems">
+  <div class="wrap">
+    <div class="shead">
+      <h2>Systems and tools</h2>
+      <p>What I use daily, and where my exposure stops. I'd rather you know before the interview.</p>
+    </div>
+    <table>
+      <thead><tr><th scope="col">Tool</th><th scope="col">Level</th><th scope="col">What I do with it</th></tr></thead>
+      <tbody>
+        <tr><td>SAP S/4HANA</td><td>Daily use</td><td>Invoice entry, parking, blocking and release; document search; PO and goods receipt lookup</td></tr>
+        <tr><td>AFI Solutions DocVerify</td><td>Daily use</td><td>Invoice capture and validation workflow, correction of captured fields</td></tr>
+        <tr><td>ServiceNow CSM</td><td>Daily use</td><td>Vendor and internal query handling, case notes, escalation to the right queue</td></tr>
+        <tr><td>Excel and Power Query</td><td>Confident</td><td>Reconciliation, volume and aging trackers, cleaning extracts into a refreshable report</td></tr>
+        <tr><td>Copilot and Claude</td><td>Confident</td><td>Drafting vendor and stakeholder correspondence, checking my own reconciliation logic</td></tr>
+        <tr><td>SAP Ariba</td><td>View access only</td><td>I can read documents in Ariba; I have not processed transactions in it</td></tr>
+        <tr><td>Languages</td><td>—</td><td>English and Malay, both working proficiency; no Japanese or Mandarin</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section id="cycle">
+  <div class="wrap">
+    <div class="shead">
+      <h2>How I read the wider cycle</h2>
+      <p>My queue sits in one part of procure-to-pay, but most exceptions are caused upstream of it. Knowing where the fault started is usually how it gets fixed.</p>
+    </div>
+    <div class="rail">
+      <svg viewBox="0 0 900 130" role="img" aria-label="Procure to pay cycle: requisition, purchase order, goods receipt, invoice, three-way match, payment run, reporting. Invoice and three-way match are highlighted as my area.">
+        <line x1="20" y1="52" x2="880" y2="52" stroke="#C7D0CE" stroke-width="1"/>
+        <g font-family="Archivo,Arial,sans-serif" font-size="13" font-weight="600">
+          <g>
+            <circle cx="20" cy="52" r="6" fill="#F1F3F2" stroke="#4A5A66" stroke-width="1.5"/>
+            <text x="20" y="32" fill="#4A5A66" text-anchor="middle">Requisition</text>
+          </g>
+          <g>
+            <circle cx="163" cy="52" r="6" fill="#F1F3F2" stroke="#4A5A66" stroke-width="1.5"/>
+            <text x="163" y="32" fill="#4A5A66" text-anchor="middle">Purchase order</text>
+          </g>
+          <g>
+            <circle cx="306" cy="52" r="6" fill="#F1F3F2" stroke="#4A5A66" stroke-width="1.5"/>
+            <text x="306" y="32" fill="#4A5A66" text-anchor="middle">Goods receipt</text>
+          </g>
+          <g>
+            <circle cx="450" cy="52" r="8" fill="#14675A"/>
+            <text x="450" y="30" fill="#14675A" font-size="14" font-weight="700" text-anchor="middle">Invoice</text>
+            <text x="450" y="82" fill="#14675A" text-anchor="middle">My work</text>
+          </g>
+          <g>
+            <circle cx="593" cy="52" r="8" fill="#14675A"/>
+            <text x="593" y="30" fill="#14675A" font-size="14" font-weight="700" text-anchor="middle">Three-way match</text>
+            <text x="593" y="82" fill="#14675A" text-anchor="middle">My work</text>
+          </g>
+          <g>
+            <circle cx="737" cy="52" r="6" fill="#F1F3F2" stroke="#4A5A66" stroke-width="1.5"/>
+            <text x="737" y="32" fill="#4A5A66" text-anchor="middle">Payment run</text>
+          </g>
+          <g>
+            <circle cx="880" cy="52" r="6" fill="#F1F3F2" stroke="#4A5A66" stroke-width="1.5"/>
+            <text x="874" y="32" fill="#4A5A66" text-anchor="middle">Reporting</text>
+          </g>
+        </g>
+        <line x1="442" y1="102" x2="601" y2="102" stroke="#14675A" stroke-width="2"/>
+      </svg>
+      <p>A price variance is a purchase order problem. A missing receipt is a warehouse problem. Both arrive as an invoice problem — so the fix usually needs the person upstream, with the evidence already gathered.</p>
+    </div>
+  </div>
+</section>
+
+<section id="about">
+  <div class="wrap two">
+    <div>
+      <h2>About me</h2>
+      <p style="margin-top:16px">I'm in the final year of a Bachelor of Islamic Finance and Banking (Hons.) at Universiti Utara Malaysia, graduating in November 2026, and I've spent this year on a procure-to-pay invoicing internship at a global pharmaceutical shared services centre in Kuala Lumpur covering EMEA and LATAM.</p>
+      <p>I'm looking for an accounts payable or finance operations role from October 2026, ideally somewhere the process is complex enough that exceptions are interesting. I plan to start the ACCA route alongside working.</p>
+      <p>Outside work I hike and play futsal. The habit that has served me best is taking on the things people assume I can't do yet — the tracker and the playbook on this page both started that way.</p>
+    </div>
+    <div>
+      <h2>Credentials</h2>
+      <ul class="creds" style="margin-top:22px">
+        <li><b>Bachelor of Islamic Finance and Banking (Hons.)</b><em>Universiti Utara Malaysia · CGPA 3.49 · Dean's List · graduating November 2026</em></li>
+        <li><b>Procure-to-Pay Invoicing Intern</b><em>Eli Lilly and Company, Global Business Solutions Kuala Lumpur · EMEA and LATAM</em></li>
+        <li><b>Treasurer, PKPIM UUM</b><em>2025 · student body finances, budgeting and reporting</em></li>
+        <li><b>ACCA</b><em>Planned registration alongside full-time work</em></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <h2>Get in touch</h2>
+    <p style="margin-top:14px">Happy to walk through any of the work above, or to talk about an accounts payable opening from October 2026.</p>
+    <div class="contact">
+      <a href="mailto:adib.humaidi@email.com">adib.humaidi@email.com</a>
+      <a href="https://www.linkedin.com/in/your-handle">LinkedIn</a>
+      <a href="resume.pdf">Resume (PDF)</a>
+      <span>Petaling Jaya, Selangor</span>
+    </div>
+    <p class="legal">Adib Humaidi Bin Mohamad Fadzil. Everything on this site is written from general procure-to-pay practice and my own documentation. No employer systems, vendor names, invoice data or internal files are reproduced here, and the sample workbook uses invented figures throughout.</p>
+  </div>
+</footer>
+
+<script>
+  document.querySelectorAll('.row button').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var row = btn.closest('.row');
+      var open = row.classList.toggle('open');
+      btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+      var caret = btn.querySelector('.caret');
+      if (caret) caret.textContent = open ? '\u2212' : '+';
+    });
+  });
+</script>
+</body>
+</html>
